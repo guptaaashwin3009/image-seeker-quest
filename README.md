@@ -1,69 +1,97 @@
-# Welcome to your Lovable project
+# Image Seeker Quest
 
-## Project info
+A simple Node.js web crawler that downloads images from websites.
 
-**URL**: https://lovable.dev/projects/c132dcf2-ddb9-4118-8141-551b8fd196b5
+## Features
 
-## How can I edit this code?
+- Crawls websites starting from a specific URL
+- Controls crawling depth
+- Downloads images from each visited page
+- Creates an index.json file with information about downloaded images
+- Only visits pages within the same domain
+- Avoids duplicates
 
-There are several ways of editing your application.
+## Installation
 
-**Use Lovable**
+### Local Installation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c132dcf2-ddb9-4118-8141-551b8fd196b5) and start prompting.
+1. Clone this repository
+2. Install dependencies:
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+npm install
 ```
 
-**Edit a file directly in GitHub**
+3. Make sure both scripts are executable:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+chmod +x index.js crawl
+```
 
-**Use GitHub Codespaces**
+### Global Installation (Recommended)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+To use the `crawl` command from anywhere, install the package globally:
 
-## What technologies are used for this project?
+```bash
+sudo npm install -g .
+```
 
-This project is built with .
+This will make the `crawl` command available system-wide.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Usage
 
-## How can I deploy this project?
+After local installation, you can use the crawler with:
 
-Simply open [Lovable](https://lovable.dev/projects/c132dcf2-ddb9-4118-8141-551b8fd196b5) and click on Share -> Publish.
+```bash
+./crawl <start_url> <depth>
+```
 
-## I want to use a custom domain - is that possible?
+After global installation, you can use it from anywhere with:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+```bash
+crawl <start_url> <depth>
+```
+
+### Parameters
+
+- `start_url`: The URL where the crawling starts
+- `depth`: The crawling depth (1 means only the starting page)
+
+### Example
+
+```bash
+crawl https://example.com 2
+```
+
+This will:
+1. Crawl https://example.com
+2. Find and download all images on that page
+3. Find all links on that page to the same domain
+4. Visit each link and download images there too
+5. Store all images in the "images" folder
+6. Create an index.json file with information about each image
+
+## Output
+
+All downloaded images are stored in the `images` folder. An `index.json` file is created with the following format:
+
+```json
+{
+  "images": [
+    {
+      "url": "https://example.com/image.jpg",
+      "page": "https://example.com",
+      "depth": 1
+    },
+    ...
+  ]
+}
+```
+
+## Dependencies
+
+- axios: For HTTP requests
+- cheerio: For HTML parsing
+- commander: For CLI argument parsing
+- fs-extra: For file system operations
+- url-parse: For URL parsing
