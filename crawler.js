@@ -62,9 +62,9 @@ async function initialize() {
  * @param {number} maxDepth - Maximum crawl depth
  * @param {number} currentDepth - Current depth of crawl
  */
-export async function crawlPage(url, maxDepth, currentDepth = 0) {
+export async function crawlPage(url, maxDepth, currentDepth = 1) {
   // Initialize on first run
-  if (currentDepth === 0) {
+  if (currentDepth === 1) {
     await initialize();
   }
 
@@ -112,7 +112,7 @@ export async function crawlPage(url, maxDepth, currentDepth = 0) {
   }
 
   // Ensure all pending updates are processed when the top-level crawl finishes
-  if (currentDepth === 0 && pendingIndexUpdates.length > 0) {
+  if (currentDepth === 1 && pendingIndexUpdates.length > 0) {
     await updateIndexBatch();
   }
 }
@@ -203,6 +203,13 @@ async function updateIndexBatch() {
   pendingIndexUpdates = [];
 
   try {
+    // Make sure to read the current index file first to avoid overwriting
+    try {
+      indexData = await fs.readJson(CONFIG.INDEX_PATH);
+    } catch (error) {
+      indexData = { images: [] };
+    }
+
     // Add all updates to the index
     indexData.images.push(...updates);
 
@@ -262,10 +269,8 @@ async function downloadImage(imageUrl, pageUrl, depth) {
       filename: filename,
     });
 
-    // Process batch update if we've reached the threshold
-    if (pendingIndexUpdates.length >= CONFIG.BATCH_SIZE) {
-      await updateIndexBatch();
-    }
+    // Always update the index immediately after download
+    await updateIndexBatch();
   } catch (error) {
     console.error(`Error downloading ${imageUrl}: ${error.message}`);
   }
